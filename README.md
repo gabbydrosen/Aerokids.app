@@ -2,17 +2,11 @@
 
 A flight simulator that teaches kids how airplanes fly. You can fly with the screen, the keyboard, or by holding any object (a book, a plate) like a steering wheel in front of your phone's camera.
 
-Made for the Congressional App Challenge.
-
-## What you can do
-
 - **Flight school** - 4 lessons: pitch, rolling and turning, straight and level, and takeoff and landing. Each one has picture cards, rings to fly through and a short quiz.
 - **Stop and teach** - if you dive too fast, climb too steep, tip the wings too far or go too slow, the game pauses and asks what will happen next.
 - **Free flight** - fly anywhere and find landmarks. Each one has a fact about flying.
 - **Careers** - jobs in aviation and some of the women who were first in flight and space.
 - **Fly for real** - programs that give kids a real first flight.
-
-No accounts and nothing about you gets saved or sent anywhere. The camera video stays on the phone.
 
 ## Running it
 
