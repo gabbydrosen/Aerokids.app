@@ -1,0 +1,1843 @@
+/* AeroKids
+   Fonts: Baloo 2 for headings, Atkinson Hyperlegible for everything else (both OFL, in /fonts).
+   Phone-sideways tweaks are at the bottom. */
+
+@font-face {
+  font-family: "Baloo 2";
+  src: url("./fonts/Baloo2.woff") format("woff");
+  font-weight: 400 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("./fonts/AtkinsonHyperlegible-Regular.woff") format("woff");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("./fonts/AtkinsonHyperlegible-Bold.woff") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --ink: #13293d;
+  --ink-soft: #52687b;
+  --paper: #fbf8f1;
+  --paper-2: #f3ede0;
+  --line: #e4dccb;
+  --line-strong: #cfc4ad;
+  --sky: #2f7fd0;
+  --sky-pale: #e4f0fb;
+  --sun: #ffc53d;
+  --coral: #d9502a;
+  --grass: #2b9a52;
+  --grass-pale: #e4f4e8;
+  --night: #0f2234;
+  --hud: rgba(13, 30, 46, 0.84);
+  --hud-line: rgba(255, 255, 255, 0.14);
+  --hud-mute: #dfe8ef;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.55);
+  --head: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", Verdana, system-ui, sans-serif;
+  --edge: 1.5px solid var(--line-strong);
+  --lift: none;
+  --sheet-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  /* Keep clear of the notch and the home bar on phones. */
+  --sl: env(safe-area-inset-left, 0px);
+  --sr: env(safe-area-inset-right, 0px);
+  --st: env(safe-area-inset-top, 0px);
+  --sb: env(safe-area-inset-bottom, 0px);
+  /* Distance from the bottom edge to just above the instrument panel. */
+  --above-panel: calc(clamp(96px, 26vh, 150px) + var(--sb));
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #cfe5f5;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.4;
+}
+body {
+  -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 3px;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--head);
+  line-height: 1.05;
+  margin: 0;
+}
+p {
+  margin: 0;
+}
+.hidden {
+  display: none !important;
+}
+
+#sim-shell {
+  position: fixed;
+  inset: 0;
+}
+#sim-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+.cloud-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.82), rgba(240, 246, 252, 0.97));
+  transition: opacity 0.25s linear;
+}
+.load-error {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  transform: translateX(-50%);
+  z-index: 60;
+  background: var(--coral);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 0;
+  font-weight: 700;
+}
+
+/* logo */
+.home-logo {
+  display: block;
+  width: clamp(110px, 30vh, 190px);
+  height: auto;
+  margin: 0 auto;
+}
+.loading-logo {
+  display: block;
+  width: 120px;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* buttons */
+/* Main buttons are solid with a darker bottom edge, like a real push button. */
+.big-button,
+.go-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 0;
+  padding: 14px 22px 16px;
+  box-shadow: var(--lift);
+  font-family: var(--head);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+  transition:
+    transform 0.08s ease-out,
+    box-shadow 0.08s ease-out,
+    background-color 0.12s;
+}
+.big-button {
+  width: 100%;
+  background: var(--sun);
+  color: var(--ink);
+}
+.big-button:hover {
+  background: #ffcd57;
+}
+.go-button {
+  background: var(--grass);
+  color: #fff;
+}
+.go-button:hover {
+  background: #30a85a;
+}
+.big-button:active,
+.go-button:active {
+  transform: translateY(2px);
+}
+.big-button:disabled,
+.go-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+  transform: none;
+  box-shadow: var(--lift);
+}
+
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: var(--edge);
+  border-radius: 0;
+  padding: 11px 16px;
+  background: #fff;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.1;
+  transition:
+    background-color 0.12s,
+    border-color 0.12s;
+}
+.secondary-button:hover {
+  border-color: var(--ink-soft);
+}
+.secondary-button:active {
+  background: var(--paper-2);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  border: 0;
+  background: none;
+  padding: 4px 0;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+.back-link::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-left: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: rotate(45deg);
+}
+.back-link:hover {
+  color: var(--ink);
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.button-row .big-button {
+  flex: 1 1 200px;
+  width: auto;
+}
+
+/* A small chevron at the end of a row that opens something. */
+.home-school::after,
+.lesson-choice::after {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin: 0 6px 0 auto;
+  border-right: 2.5px solid var(--line-strong);
+  border-top: 2.5px solid var(--line-strong);
+  transform: rotate(45deg);
+}
+
+/* loading */
+.loading-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: #8ec3ee;
+}
+.loading-panel {
+  width: min(440px, 100%);
+  display: grid;
+  gap: 14px;
+  padding: 24px 28px 26px;
+  background: var(--paper);
+  border-radius: 0;
+  box-shadow: var(--sheet-shadow);
+}
+.loading-panel h1 {
+  font-size: 30px;
+}
+.loading-track {
+  position: relative;
+  height: 6px;
+  margin: 10px 0 4px;
+  border-radius: 0;
+  background: var(--line);
+}
+#loading-bar {
+  height: 100%;
+  width: 4%;
+  border-radius: 0;
+  background: var(--sky);
+  transition: width 0.25s ease-out;
+}
+#loading-status {
+  min-height: 1.4em;
+  color: var(--ink-soft);
+}
+
+/* home */
+/* One paper sheet docked on the left; the plane circles on the runway to its right.
+   The sheet shows either the home choices or the Flight school list (data-view). */
+.home-screen {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  width: min(460px, 50%);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(12px, 3.6vh, 28px);
+  padding: calc(clamp(12px, 3.6vh, 36px) + var(--st)) clamp(18px, 3.4vw, 40px)
+    calc(clamp(12px, 3.6vh, 36px) + var(--sb)) calc(clamp(18px, 3.4vw, 40px) + var(--sl));
+  background: var(--paper);
+  box-shadow: var(--sheet-shadow);
+  border-radius: 0;
+}
+.home-screen[data-view="home"] .home-lessons,
+.home-screen[data-view="school"] .home-main {
+  display: none;
+}
+
+.home-main {
+  display: grid;
+  gap: clamp(8px, 1.8vh, 12px);
+}
+.home-tag {
+  margin: -4px 0 clamp(2px, 1vh, 8px);
+  font-size: clamp(15px, 3.4vh, 19px);
+  color: var(--ink-soft);
+}
+.home-fly {
+  font-size: clamp(22px, 5.4vh, 30px);
+  padding: clamp(10px, 2.6vh, 18px) 16px clamp(12px, 3vh, 20px);
+}
+.home-school {
+  justify-content: flex-start;
+  gap: 14px;
+  padding: clamp(8px, 2vh, 14px) 14px;
+  text-align: left;
+}
+.home-school strong {
+  display: block;
+  font-family: var(--head);
+  font-size: clamp(18px, 4.4vh, 22px);
+  line-height: 1.1;
+}
+.home-school small {
+  display: block;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.home-school::after {
+  margin-right: 4px;
+}
+.school-icon {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* Camera setup is a quieter third choice: a text button, not a third box. */
+.home-cam {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+  border: 0;
+  background: none;
+  padding: 4px 2px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+.home-cam:hover {
+  color: var(--ink);
+}
+body.camera-yoke .home-cam {
+  color: var(--grass);
+}
+.cam-icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+/* Free flight, Careers and Fly for real: white rows with an icon, a name and one line. */
+.home-row {
+  justify-content: flex-start;
+  gap: 12px;
+  padding: clamp(7px, 1.8vh, 12px) 12px;
+  text-align: left;
+}
+.home-row strong {
+  display: block;
+  font-family: var(--head);
+  font-size: clamp(17px, 4.2vh, 21px);
+  line-height: 1.1;
+}
+.home-row small {
+  display: block;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.home-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(8px, 1.8vh, 12px);
+}
+
+/* Flight school */
+.home-lessons {
+  display: grid;
+  gap: clamp(4px, 1.2vh, 10px);
+}
+.school-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 4px;
+}
+.school-head h2 {
+  font-size: clamp(24px, 6vh, 32px);
+}
+#learning-progress {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.school-intro {
+  padding: 0 4px;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+.lesson-list {
+  display: grid;
+  border-top: 1px solid var(--line);
+}
+.lesson-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  padding: clamp(5px, 1.5vh, 11px) 4px;
+  transition: background-color 0.12s;
+}
+.lesson-choice:hover {
+  background: var(--paper-2);
+}
+.lesson-choice:hover::after {
+  border-color: var(--ink);
+}
+.lesson-choice > span:last-of-type {
+  flex: 1;
+  min-width: 0;
+}
+.lesson-choice strong {
+  display: block;
+  font-family: var(--head);
+  font-size: clamp(17px, 4vh, 21px);
+  line-height: 1.15;
+}
+.lesson-choice small {
+  display: block;
+  font-size: clamp(13px, 3vh, 15px);
+  color: var(--ink-soft);
+}
+.lesson-num {
+  position: relative;
+  flex: 0 0 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 0;
+  border: 1.5px solid var(--line-strong);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.lesson-choice.done .lesson-num {
+  background: var(--grass);
+  border-color: var(--grass);
+  color: transparent;
+}
+.lesson-choice.done .lesson-num::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 5px;
+  width: 6px;
+  height: 11px;
+  border: solid #fff;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+}
+
+/* dialogs */
+.dialog-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(13, 30, 46, 0.45);
+}
+.light-dialog {
+  width: min(600px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 26px 26px;
+  background: var(--paper);
+  border-radius: 0;
+  box-shadow: var(--sheet-shadow);
+}
+.light-dialog h2 {
+  font-size: 32px;
+}
+.light-dialog > p {
+  font-size: 19px;
+}
+.kicker {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+.kicker.danger {
+  color: var(--coral);
+}
+.kicker.success {
+  color: var(--grass);
+}
+.control-reminder {
+  padding: 10px 14px;
+  border-radius: 0;
+  background: var(--sky-pale);
+  font-weight: 700;
+}
+.control-reminder:empty {
+  display: none;
+}
+
+.choice-list {
+  display: grid;
+  gap: 10px;
+}
+.choice-btn {
+  text-align: left;
+  border: var(--edge);
+  border-radius: 0;
+  background: #fff;
+  padding: 12px 16px;
+  font-weight: 700;
+  font-size: 18px;
+}
+.choice-btn:hover:not(:disabled) {
+  border-color: var(--sky);
+  background: var(--sky-pale);
+}
+.choice-btn.correct {
+  border-color: var(--grass);
+  background: var(--grass-pale);
+}
+.choice-btn.wrong {
+  border-color: var(--coral);
+  background: #ffe6df;
+  animation: nudge 0.3s ease-out;
+}
+.choice-btn:disabled:not(.correct) {
+  opacity: 0.55;
+}
+@keyframes nudge {
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+.answer-result {
+  min-height: 1.4em;
+  font-size: 17px;
+}
+
+/* Flight plan */
+.route-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.route-stop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+.route-stop span {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sun);
+  font-size: 14px;
+}
+.route-line {
+  flex: 1 1 16px;
+  min-width: 12px;
+  border-top: 2px dashed var(--line-strong);
+}
+.plan-question h3 {
+  margin-bottom: 10px;
+  font-size: 22px;
+}
+
+/* Flashcard pictures (drawings.js) */
+.flash-visual {
+  padding: 6px;
+  border-radius: 0;
+  background: var(--sky-pale);
+}
+.flash-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 220px;
+}
+.flash-art .fa-plane,
+.flash-art .fa-body {
+  fill: var(--sky);
+  stroke: var(--ink);
+}
+.flash-art .fa-plane {
+  stroke-width: 0.6;
+}
+.flash-art .fa-body {
+  stroke-width: 3;
+}
+.flash-art .fa-horizon {
+  fill: none;
+  stroke: #8fb6d8;
+  stroke-width: 2;
+  stroke-dasharray: 6 6;
+}
+.flash-art .fa-ground {
+  stroke: #6aa84f;
+  stroke-width: 8;
+}
+.flash-art .fa-runway {
+  stroke: #59616b;
+  stroke-width: 8;
+}
+.flash-art .fa-center {
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-dasharray: 8 8;
+}
+.flash-art .fa-accent,
+.flash-art .fa-wind,
+.flash-art .fa-path,
+.flash-art .fa-dash,
+.flash-art .fa-wing,
+.flash-art .fa-tick,
+.flash-art .fa-needle-line {
+  fill: none;
+  stroke-linecap: round;
+}
+.flash-art .fa-accent {
+  stroke: var(--coral);
+  stroke-width: 4;
+}
+.flash-art .fa-accent-fill {
+  fill: var(--coral);
+}
+.flash-art .fa-wind {
+  stroke: #5a9bd4;
+  stroke-width: 3;
+}
+.flash-art .fa-path {
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-dasharray: 7 6;
+}
+.flash-art .fa-dash {
+  stroke: var(--ink-soft);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+.flash-art .fa-wing {
+  stroke: var(--ink);
+  stroke-width: 7;
+}
+.flash-art .fa-face {
+  fill: var(--night);
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+.flash-art .fa-tick,
+.flash-art .fa-needle-line {
+  stroke: #fff;
+  stroke-width: 2.5;
+}
+.flash-art .fa-needle {
+  fill: #fff;
+}
+.flash-art .fa-label {
+  font: 700 13px var(--body);
+  fill: var(--ink);
+}
+.flash-art .fa-big {
+  font: 800 20px var(--head);
+  fill: var(--ink);
+}
+
+/* Careers and Fly for real: a scrolling sheet of small cards. */
+.info-dialog {
+  width: min(720px, 100%);
+}
+.career-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.career {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 12px 14px;
+  border: var(--edge);
+  border-radius: 0;
+  background: #fff;
+}
+.career h3 {
+  font-size: 20px;
+}
+.career p {
+  font-size: 15px;
+}
+.career small {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sky);
+}
+.link-card {
+  color: inherit;
+  text-decoration: none;
+}
+.link-card:hover {
+  border-color: var(--sky);
+  background: var(--sky-pale);
+}
+.link-card h3::after {
+  content: " \2197";
+  color: var(--sky);
+}
+.info-head {
+  margin-top: 4px;
+  font-size: 22px;
+}
+.leader-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  font-size: 16px;
+}
+
+/* Pause menu and flight log */
+#pause-screen .light-dialog {
+  width: min(560px, 100%);
+  gap: 12px;
+}
+.pause-row {
+  gap: 8px;
+}
+.pause-row .secondary-button {
+  flex: 1 1 120px;
+  padding: 10px;
+  font-size: 16px;
+}
+.pilot-log {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 0;
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.pilot-log:empty {
+  display: none;
+}
+.pilot-log div {
+  padding: 2px 16px 2px 0;
+}
+.pilot-log div + div {
+  padding-left: 16px;
+  border-left: 1px solid var(--line);
+}
+.pilot-log dt {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.pilot-log dd {
+  margin: 0;
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+/* flight hud */
+.hud {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+.hud button {
+  pointer-events: auto;
+}
+
+.hud-actions {
+  position: absolute;
+  top: calc(10px + var(--st));
+  left: calc(10px + var(--sl));
+  max-width: 45%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.hud-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 0;
+  padding: clamp(5px, 1.2vh, 8px) 12px;
+  background: var(--hud);
+  color: #fff;
+  font-weight: 700;
+  font-size: clamp(13px, 3vh, 16px);
+}
+.hud-button:hover {
+  background: rgba(13, 30, 46, 0.95);
+}
+.hud-button svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+.pause-button svg {
+  fill: currentColor;
+}
+body.camera-yoke #camera-btn {
+  display: none;
+}
+
+/* text over the flight view: no boxes, just white text with a shadow */
+.lesson-card,
+.feedback,
+.target-card,
+.mission-progress,
+.panel {
+  color: #fff;
+  text-shadow: var(--shadow);
+}
+
+.hud-left {
+  position: absolute;
+  top: calc(clamp(44px, 10vh, 56px) + var(--st));
+  left: calc(10px + var(--sl));
+  width: min(320px, 36%);
+  display: grid;
+}
+.lesson-card {
+  padding: 4px 2px 2px;
+}
+.lesson-card h2 {
+  font-size: clamp(17px, 4vh, 22px);
+}
+.feedback {
+  padding: 0 2px;
+  font-weight: 700;
+  font-size: clamp(13px, 3vh, 15px);
+  color: var(--sun);
+}
+
+.hud-right {
+  position: absolute;
+  top: calc(10px + var(--st));
+  right: calc(10px + var(--sr));
+  width: min(290px, 34%);
+  display: grid;
+  gap: 6px;
+}
+.target-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px;
+}
+.target-text {
+  flex: 1;
+  display: grid;
+}
+.target-text span {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--hud-mute);
+}
+#target-main {
+  font-family: var(--head);
+  font-size: clamp(17px, 4vh, 22px);
+  line-height: 1.1;
+}
+#target-sub {
+  font-size: 13px;
+  color: var(--hud-mute);
+}
+.target-arrow {
+  flex: 0 0 clamp(38px, 9vh, 52px);
+  width: clamp(38px, 9vh, 52px);
+  height: clamp(38px, 9vh, 52px);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+}
+.target-arrow path {
+  fill: var(--sun);
+  stroke: rgba(0, 0, 0, 0.5);
+  stroke-width: 1;
+}
+#target-arrow-needle {
+  transition: transform 0.15s linear;
+}
+.mission-progress {
+  padding: 2px;
+}
+.mission-progress-top {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 14px;
+}
+.mission-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.mission-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.mission-dot.current {
+  border-color: var(--sun);
+}
+.mission-dot.done {
+  border-color: var(--grass);
+  background: var(--grass);
+}
+
+.skill-toast {
+  position: absolute;
+  left: 50%;
+  bottom: var(--above-panel);
+  transform: translateX(-50%);
+  max-width: min(460px, 50%);
+  padding: 4px 8px;
+  color: #fff;
+  text-shadow: var(--shadow);
+  font-weight: 700;
+  font-size: clamp(13px, 3vh, 16px);
+  text-align: center;
+}
+.skill-toast.education-toast {
+  color: #b9f5c9;
+}
+/* Free flight: the landmark fact, on the green "learning" color. */
+.fact-card {
+  position: absolute;
+  left: 50%;
+  bottom: var(--above-panel);
+  transform: translateX(-50%);
+  width: min(420px, 50%);
+  padding: 10px 14px;
+  border-radius: 0;
+  background: var(--grass);
+  color: #fff;
+}
+.fact-card span {
+  font-weight: 700;
+  font-size: 13px;
+}
+.fact-card strong {
+  display: block;
+  font-family: var(--head);
+  font-size: 22px;
+  line-height: 1.1;
+}
+.fact-card p {
+  margin-top: 2px;
+  font-size: 15px;
+}
+.ground-warning {
+  position: absolute;
+  left: 50%;
+  bottom: var(--above-panel);
+  transform: translateX(-50%);
+  display: grid;
+  padding: 8px 18px;
+  border-radius: 0;
+  background: var(--coral);
+  color: #fff;
+  text-align: center;
+}
+.ground-warning strong {
+  font-family: var(--head);
+  font-size: 22px;
+}
+
+/* Instrument panel: attitude, airspeed, altitude, heading and vertical speed. */
+.panel {
+  --gauge: clamp(64px, 17vh, 100px);
+  position: absolute;
+  left: 50%;
+  bottom: calc(8px + var(--sb));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 4px;
+}
+.instrument-strip {
+  display: flex;
+  gap: 10px;
+}
+.gauge {
+  position: relative;
+  width: var(--gauge);
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+.gauge svg {
+  display: block;
+  width: var(--gauge);
+  height: var(--gauge);
+}
+.gauge .face {
+  fill: #0b1d2b;
+  stroke: #6d8191;
+  stroke-width: 2;
+}
+.gauge .tick {
+  stroke: #c7d3dd;
+  stroke-width: 1.2;
+}
+.gauge .tick.major {
+  stroke: #fff;
+  stroke-width: 2.4;
+}
+.gauge .num {
+  fill: #fff;
+  font: 700 9px var(--body);
+  text-anchor: middle;
+}
+.gauge .num.cardinal {
+  fill: var(--sun);
+  font-size: 11px;
+}
+.gauge .tiny {
+  fill: #9fb2c2;
+  font: 700 6px var(--body);
+}
+.gauge .arc-green {
+  fill: none;
+  stroke: #3fbf6a;
+  stroke-width: 5;
+}
+.gauge .arc-yellow {
+  fill: none;
+  stroke: #f2c230;
+  stroke-width: 5;
+}
+.gauge .redline {
+  stroke: #e4572e;
+  stroke-width: 3;
+}
+.gauge .needle {
+  fill: #fff;
+  stroke: #0b1d2b;
+  stroke-width: 0.8;
+}
+.gauge .hub,
+.gauge .lubber {
+  fill: var(--coral);
+}
+.gauge .hdg-plane {
+  fill: #fff;
+}
+.gauge-label {
+  display: none;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--hud-mute);
+}
+.needle-group {
+  transform-origin: 0 0;
+  transition: transform 0.1s linear;
+}
+.readout {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  margin-top: 2px;
+}
+.readout strong {
+  font-family: var(--head);
+  font-size: 18px;
+  line-height: 1.2;
+}
+.readout small {
+  font-size: 11px;
+  color: var(--hud-mute);
+}
+
+.att-clip {
+  position: relative;
+  width: var(--gauge);
+  height: var(--gauge);
+  overflow: hidden;
+  border-radius: 50%;
+  border: 2px solid var(--hud-line);
+}
+.att-horizon {
+  position: absolute;
+  left: -60%;
+  top: -60%;
+  width: 220%;
+  height: 220%;
+  transition: transform 0.1s linear;
+}
+.att-sky {
+  position: absolute;
+  inset: 0 0 50% 0;
+  background: #4a90d9;
+}
+.att-ground {
+  position: absolute;
+  inset: 50% 0 0 0;
+  background: #8b5a2b;
+}
+.att-lines {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  border-top: 2px solid #fff;
+  transform: translate(-50%, -1px);
+  box-shadow:
+    0 -16px 0 rgba(255, 255, 255, 0.6),
+    0 16px 0 rgba(255, 255, 255, 0.6);
+}
+.att-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--gauge);
+  height: var(--gauge);
+}
+.att-face .bank {
+  stroke: #fff;
+  stroke-width: 2;
+}
+.att-face .att-pointer,
+.att-face .att-dot {
+  fill: var(--sun);
+}
+.att-face .att-plane {
+  fill: none;
+  stroke: var(--sun);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Power lever: tick marks every 25%, a sun-yellow fill and a white handle on top of it. */
+.power-lever {
+  position: absolute;
+  left: calc(10px + var(--sl));
+  bottom: calc(10px + var(--sb));
+  width: clamp(56px, 12vh, 70px);
+  height: clamp(130px, 40vh, 220px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  gap: 6px;
+  padding: 7px 0 12px;
+  border-radius: 0;
+  background: var(--hud);
+  color: #fff;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.power-lever span {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--hud-mute);
+}
+.power-lever-track {
+  position: relative;
+  width: 28px;
+  height: 100%;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.08)
+    repeating-linear-gradient(to top, transparent 0 calc(25% - 1px), var(--hud-line) calc(25% - 1px) 25%);
+}
+#power-lever-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0%;
+  border-radius: 0;
+  background: var(--sun);
+}
+#power-lever-fill::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  right: -5px;
+  top: -3px;
+  height: 6px;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Cockpit view (C key) */
+.cockpit-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.windshield-post {
+  position: absolute;
+  top: -10%;
+  bottom: 20%;
+  width: 46px;
+  border-radius: 0;
+  background: #1c2a36;
+}
+.windshield-post.left {
+  left: 6%;
+  transform: rotate(12deg);
+}
+.windshield-post.right {
+  right: 6%;
+  transform: rotate(-12deg);
+}
+.cockpit-reticle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.reticle-wing {
+  width: 46px;
+  height: 4px;
+  border-radius: 0;
+  background: var(--sun);
+}
+.reticle-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sun);
+}
+.cockpit-dash {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 168px;
+  border-top: 4px solid #0e1821;
+  background: #1c2a36;
+}
+/* The dash readouts are a fallback; the gauge panel sits on the dashboard. */
+.cockpit-dash > div {
+  display: none;
+}
+body.cockpit-view .panel {
+  background: #0e1821;
+}
+
+/* camera yoke */
+.camera-dialog {
+  width: min(560px, 100%);
+  gap: 10px;
+}
+.camera-dialog h2 {
+  font-size: 30px;
+}
+.cam-step {
+  min-height: 2.8em;
+  font-size: 18px;
+}
+.cam-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 46vh;
+  overflow: hidden;
+  border-radius: 0;
+  background: var(--night);
+}
+.cam-stage video,
+.cam-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+.cam-stage video.mirrored {
+  transform: scaleX(-1);
+}
+.cam-countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: 96px;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(13, 30, 46, 0.6);
+  pointer-events: none;
+}
+.cam-warning {
+  padding: 8px 12px;
+  border-radius: 0;
+  background: #fdeae3;
+  color: #8a2a10;
+  font-weight: 700;
+}
+.cam-meters {
+  display: grid;
+  gap: 6px;
+}
+.cam-meters > div {
+  display: grid;
+  grid-template-columns: 52px 1fr 92px;
+  align-items: center;
+  gap: 10px;
+}
+.cam-meters span {
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.cam-meters strong {
+  font-family: var(--head);
+  font-size: 19px;
+}
+.cam-meter {
+  position: relative;
+  height: 14px;
+  overflow: hidden;
+  border-radius: 0;
+  background: var(--line);
+}
+.cam-meter::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--line-strong);
+}
+.cam-meter i {
+  position: absolute;
+  left: 25%;
+  width: 50%;
+  top: 0;
+  bottom: 0;
+}
+.cam-meter i::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 1px;
+  bottom: 1px;
+  width: 14px;
+  margin-left: -7px;
+  border-radius: 0;
+  background: var(--ink);
+}
+.cam-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cam-options .secondary-button {
+  padding: 8px 12px;
+  font-size: 16px;
+}
+.cam-options:not(:has(:not(.hidden))) {
+  display: none;
+}
+.cam-privacy {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+/* The small camera view in flight. A green dot means the camera sees the object; coral means it lost it. */
+.cam-mini {
+  position: absolute;
+  right: calc(10px + var(--sr));
+  bottom: calc(10px + var(--sb));
+  width: clamp(140px, 30vh, 170px);
+  overflow: hidden;
+  border-radius: 0;
+  background: var(--hud);
+  pointer-events: auto;
+}
+.cam-mini canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.cam-mini-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 5px 8px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+}
+.cam-mini-status::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4fd07a;
+}
+.cam-mini.lost .cam-mini-status::before {
+  background: var(--coral);
+}
+
+/* turn your phone sideways */
+.rotate-screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 24px;
+  background: #8ec3ee;
+  color: var(--ink);
+  text-align: center;
+}
+.rotate-screen h2 {
+  font-size: 32px;
+}
+.rotate-screen p {
+  max-width: 300px;
+  font-size: 18px;
+}
+.rotate-phone {
+  width: 140px;
+  height: 140px;
+  animation: rotate-hint 2.4s ease-in-out infinite;
+}
+.rotate-phone .phone {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+.rotate-phone .dot {
+  fill: var(--ink);
+}
+.rotate-phone .turn {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@keyframes rotate-hint {
+  0%,
+  25% {
+    transform: rotate(0);
+  }
+  55%,
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+
+/* screen sizes */
+@media (orientation: portrait) and (pointer: coarse), (orientation: portrait) and (max-width: 600px) {
+  .rotate-screen {
+    display: grid;
+  }
+}
+
+@media (max-width: 820px) {
+  .instrument-strip .gauge:nth-child(4) {
+    display: none;
+  }
+}
+
+@media (max-height: 430px) {
+  .school-intro {
+    display: none;
+  }
+}
+
+/* Short screens (phones held sideways): tighter dialogs, pictures beside the words,
+   and a lighter flight screen with fewer, smaller plates. */
+@media (max-height: 520px) {
+  /* Pause becomes an icon; the camera button lives in the Pause menu. */
+  .pause-button {
+    gap: 0;
+    padding: 8px 10px;
+    font-size: 0;
+  }
+  .pause-button svg {
+    width: 18px;
+    height: 18px;
+  }
+  #camera-btn {
+    display: none;
+  }
+
+  .hud-left {
+    top: calc(10px + var(--st));
+    left: calc(56px + var(--sl));
+    width: min(280px, 34%);
+  }
+  .lesson-card h2 {
+    font-size: 16px;
+  }
+  .feedback {
+    font-size: 13px;
+  }
+  .hud-right {
+    width: min(240px, 30%);
+    gap: 0;
+  }
+  #target-sub {
+    display: none;
+  }
+  .target-arrow {
+    flex-basis: 34px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .target-card:not(.hidden) + .mission-progress .mission-progress-top span {
+    display: none;
+  }
+  .mission-progress {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .mission-progress-top {
+    font-size: 13px;
+  }
+  .mission-dots {
+    margin-top: 0;
+    gap: 4px;
+  }
+  .mission-dot {
+    width: 12px;
+    height: 12px;
+    border-width: 2px;
+  }
+
+  /* Gauges become a slim strip: attitude plus airspeed and altitude as numbers. */
+  .panel {
+    --gauge: 54px;
+    align-items: center;
+    padding: 2px;
+  }
+  .instrument-strip {
+    gap: 0;
+  }
+  .instrument-strip .gauge {
+    width: auto;
+    min-width: 72px;
+    justify-items: start;
+    gap: 0;
+    padding: 0 10px;
+  }
+  .instrument-strip .gauge + .gauge {
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+  }
+  .instrument-strip .gauge svg,
+  .instrument-strip .gauge:nth-child(n + 3) {
+    display: none;
+  }
+  .instrument-strip .gauge-label {
+    display: block;
+    order: -1;
+    font-size: 11px;
+  }
+  .instrument-strip .readout {
+    margin: 0;
+  }
+  .instrument-strip .readout strong {
+    font-size: 20px;
+    line-height: 1.1;
+  }
+
+  .power-lever {
+    width: 44px;
+    height: clamp(110px, 34vh, 150px);
+    gap: 4px;
+    padding: 5px 0 9px;
+  }
+  .power-lever span {
+    font-size: 11px;
+  }
+  .power-lever-track {
+    width: 20px;
+  }
+  .cam-mini {
+    width: 112px;
+  }
+  .cam-mini-status {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+
+  .dialog-screen {
+    padding: calc(8px + var(--st)) calc(12px + var(--sr)) calc(8px + var(--sb)) calc(12px + var(--sl));
+  }
+  .light-dialog {
+    gap: 8px;
+    padding: 14px 20px 16px;
+  }
+  .light-dialog h2 {
+    font-size: 24px;
+  }
+  .light-dialog > p {
+    font-size: 16px;
+  }
+  .big-button,
+  .go-button {
+    padding: 10px 16px 12px;
+    font-size: 19px;
+  }
+  .secondary-button {
+    padding: 9px 14px;
+    font-size: 16px;
+  }
+  .choice-btn {
+    padding: 8px 12px;
+    font-size: 16px;
+  }
+
+  /* Dialogs with a picture or a question go side by side. */
+  .plan-dialog,
+  .flash-dialog,
+  .camera-dialog {
+    width: min(780px, 100%);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-content: start;
+  }
+  .plan-dialog {
+    gap: 6px 20px;
+  }
+  .plan-dialog > * {
+    grid-column: 1;
+  }
+  .plan-dialog .plan-question,
+  .plan-dialog #plan-next-btn {
+    grid-column: 2;
+  }
+  .plan-dialog .plan-question {
+    grid-row: 1 / span 5;
+  }
+  .plan-question h3 {
+    margin-bottom: 8px;
+    font-size: 18px;
+  }
+  .route-strip {
+    gap: 4px 6px;
+  }
+  .route-stop {
+    font-size: 15px;
+  }
+  .route-stop span {
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+  }
+  .flash-dialog {
+    gap: 6px 18px;
+  }
+  .flash-dialog > * {
+    grid-column: 2;
+  }
+  .flash-dialog .flash-visual {
+    grid-column: 1;
+    grid-row: 1 / span 5;
+    align-self: center;
+  }
+  .flash-art {
+    max-height: 62vh;
+  }
+  .camera-dialog {
+    grid-auto-flow: dense;
+    gap: 8px 16px;
+    padding: 12px 18px 14px;
+  }
+  .camera-dialog > * {
+    grid-column: 2;
+  }
+  .camera-dialog .cam-stage {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    max-height: none;
+    align-self: start;
+  }
+  .camera-dialog h2 {
+    font-size: 24px;
+  }
+  .cam-step {
+    min-height: 0;
+    font-size: 15px;
+  }
+  .cam-privacy {
+    display: none;
+  }
+  .home-row small {
+    display: none;
+  }
+  .fact-card {
+    bottom: calc(100px + var(--sb));
+    width: min(380px, 50%);
+    padding: 6px 10px;
+  }
+  /* In Free flight the distance to the landmark matters, so keep it on screen. */
+  body.free-flight #target-sub {
+    display: block;
+  }
+  .fact-card strong {
+    font-size: 17px;
+  }
+  .fact-card p {
+    font-size: 13px;
+  }
+  .career {
+    padding: 8px 12px;
+  }
+  .career h3 {
+    font-size: 17px;
+  }
+  .career p,
+  .leader-list {
+    font-size: 14px;
+  }
+  /* Stop and teach: question on the left, answers on the right, so it fits without scrolling. */
+  .question-dialog {
+    width: min(780px, 100%);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px 20px;
+    align-content: start;
+  }
+  .question-dialog > * {
+    grid-column: 1;
+  }
+  .question-dialog #question-options {
+    grid-column: 2;
+    grid-row: 1 / span 6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

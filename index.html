@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>AeroKids Flight Simulator</title>
+    <meta name="theme-color" content="#13293d" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="AeroKids" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./images/icon-512.png" />
+    <meta name="description" content="Learn how airplanes fly with your phone and anything you can hold." />
+    <link rel="icon" href="./images/icon-192.png" />
+    <link rel="preload" href="./fonts/Baloo2.woff" as="font" type="font/woff" crossorigin />
+    <link rel="stylesheet" href="./style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three/build/three.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <symbol id="plane-top" viewBox="0 0 24 24">
+        <path
+          d="M12 3c.8 0 1.3.9 1.3 2.1v4.1l6.4 3.7v1.8l-6.4-1.9v3.9l1.9 1.4v1.4L12 18.8l-3.2.7v-1.4l1.9-1.4v-3.9l-6.4 1.9v-1.8l6.4-3.7V5.1C10.7 3.9 11.2 3 12 3z"
+        />
+      </symbol>
+      <symbol id="plane-side" viewBox="0 0 48 24">
+        <path
+          d="M5 13.6C5 12.1 6.1 11 8 11H31c4.2 0 8.1 1 10.6 2.5 1 .6.8 1.9-.4 2.2-3.2.8-7.2 1.3-11.2 1.3H10c-2.9 0-5-1.5-5-3.4zM5.6 12.2 3.8 4.4h3.4L12 11.2zM17 9.4h17.5v1.9H17zM13.4 17h1.2v2.2h-1.2zM31.4 17h1.2v2.2h-1.2zM12.4 19.8a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0-3.2 0zM30.4 19.8a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0-3.2 0zM42.2 9.8h1.1v8.6h-1.1z"
+        />
+      </symbol>
+    </svg>
+    <main id="sim-shell">
+      <section id="loading-screen" class="loading-screen" role="status" aria-live="polite">
+        <div class="loading-panel">
+          <img class="loading-logo" src="./images/logo.png" alt="AeroKids" />
+          <h1 id="loading-title">Getting your plane ready</h1>
+          <div class="loading-track" aria-hidden="true">
+            <div id="loading-bar"></div>
+          </div>
+          <p id="loading-status">Loading the airplane…</p>
+          <button id="loading-retry" class="big-button hidden" type="button">Restart the app</button>
+        </div>
+      </section>
+      <canvas id="sim-canvas" aria-label="3D flight simulator view"></canvas>
+      <div id="cloud-veil" class="cloud-veil" aria-hidden="true"></div>
+
+      <!-- HOME: the menu sheet. data-view switches between the menu and the
+         Flight school list without leaving this screen. -->
+      <section id="home-screen" class="home-screen" data-view="home">
+        <div class="home-main">
+          <img class="home-logo" src="./images/logo.png" alt="AeroKids" />
+          <p class="home-tag">Learn how airplanes fly, using your phone and anything you can hold.</p>
+          <button id="school-btn" class="go-button home-fly" type="button" disabled>Flight school</button>
+          <button id="free-btn" class="secondary-button home-row" type="button">
+            <span><strong>Free flight</strong><small>Fly anywhere and find landmarks</small></span>
+          </button>
+          <div class="home-pair">
+            <button id="careers-btn" class="secondary-button home-row" type="button">
+              <span><strong>Careers</strong><small>Jobs in the sky</small></span>
+            </button>
+            <button id="discovery-btn" class="secondary-button home-row" type="button">
+              <span><strong>Fly for real</strong><small>Find a first flight</small></span>
+            </button>
+          </div>
+          <button id="camera-menu-btn" class="home-cam" type="button">
+            <span id="camera-menu-label">Set up camera yoke</span>
+          </button>
+        </div>
+        <div class="home-lessons">
+          <button id="school-back" class="back-link" type="button">Home</button>
+          <div class="school-head">
+            <h2>Flight school</h2>
+            <p id="learning-progress">0 of 4 done</p>
+          </div>
+          <p class="school-intro">
+            Each lesson has a quick question, four cards, a flight through rings and a short quiz.
+          </p>
+          <div class="lesson-list">
+            <button class="lesson-choice" type="button" data-lesson="pitch">
+              <span class="lesson-num">1</span>
+              <span
+                ><strong>Pitch</strong><small>Point the nose up to climb and down to descend.</small></span
+              >
+            </button>
+            <button class="lesson-choice" type="button" data-lesson="roll">
+              <span class="lesson-num">2</span>
+              <span
+                ><strong>Roll and turn</strong><small>Tip the wings to turn, then level them.</small></span
+              >
+            </button>
+            <button class="lesson-choice" type="button" data-lesson="level">
+              <span class="lesson-num">3</span>
+              <span
+                ><strong>Straight and level</strong
+                ><small>Keep your height, speed and wings steady.</small></span
+              >
+            </button>
+            <button class="lesson-choice" type="button" data-lesson="landing">
+              <span class="lesson-num">4</span>
+              <span><strong>Takeoff and landing</strong><small>Fly to Meadow Airport and land.</small></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FLIGHT PLAN: the first step of every lesson -->
+      <section id="plan-screen" class="dialog-screen hidden">
+        <div class="light-dialog plan-dialog">
+          <button id="plan-back-btn" class="back-link" type="button">Home</button>
+          <p class="kicker">Before you fly</p>
+          <h2 id="plan-title">Flight plan</h2>
+          <p id="plan-copy">Think through the flight before you take off.</p>
+          <div id="plan-route" class="route-strip"></div>
+          <div id="plan-question" class="plan-question">
+            <h3>What should you do first?</h3>
+            <div id="plan-options" class="choice-list"></div>
+            <p id="plan-result" class="answer-result"></p>
+          </div>
+          <button id="plan-next-btn" class="big-button hidden" type="button">Start the cards</button>
+        </div>
+      </section>
+
+      <!-- FLASHCARDS -->
+      <section id="flashcard-screen" class="dialog-screen hidden">
+        <div class="light-dialog flash-dialog">
+          <button id="flash-back-btn" class="back-link" type="button">Home</button>
+          <p class="kicker" id="flash-count">Card 1 of 4</p>
+          <div id="flash-picture" class="flash-visual"></div>
+          <h2 id="flash-title">Pitch</h2>
+          <p id="flash-text">Pitch means the nose moves up or down.</p>
+          <button id="flash-next-btn" class="big-button" type="button">Next</button>
+        </div>
+      </section>
+
+      <!-- FLIGHT HUD -->
+      <section id="hud" class="hud hidden">
+        <div class="hud-actions">
+          <button id="pause-btn" class="hud-button pause-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="6" y="5" width="4" height="14" rx="1" />
+              <rect x="14" y="5" width="4" height="14" rx="1" /></svg
+            >Pause
+          </button>
+          <button id="camera-btn" class="hud-button" type="button">
+            <svg class="cam-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M4 7h3l2-2.5h6L17 7h3a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 19H4a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 4 7z"
+              />
+              <circle cx="12" cy="12.8" r="3.6" /></svg
+            >Camera yoke
+          </button>
+        </div>
+
+        <div class="hud-left">
+          <div class="lesson-card">
+            <h2 id="lesson-title">Take off from the runway.</h2>
+          </div>
+          <div id="feedback" class="feedback">Stay lined up with the runway.</div>
+        </div>
+
+        <div class="hud-right">
+          <div class="target-card">
+            <div class="target-text">
+              <span>Your job</span><strong id="target-main">Take off</strong
+              ><small id="target-sub">Power, speed, nose up</small>
+            </div>
+            <svg id="target-arrow" class="target-arrow hidden" viewBox="-20 -20 40 40" aria-hidden="true">
+              <g id="target-arrow-needle"><path d="M0-16 9 6 0 1-9 6z" /></g>
+            </svg>
+          </div>
+          <div id="mission-progress" class="mission-progress hidden">
+            <div class="mission-progress-top">
+              <span>Rings</span><strong id="mission-progress-count">0 / 5</strong>
+            </div>
+            <div id="mission-dots" class="mission-dots"></div>
+          </div>
+        </div>
+        <div id="skill-toast" class="skill-toast hidden" role="status" aria-live="polite">Ring cleared!</div>
+
+        <!-- Free flight: a fact pops up when you find a landmark -->
+        <div id="fact-card" class="fact-card hidden" role="status" aria-live="polite">
+          <span id="fact-kicker">You found it</span>
+          <strong id="fact-title">Hot-air balloon</strong>
+          <p id="fact-text"></p>
+        </div>
+
+        <div class="panel">
+          <div class="gauge attitude" title="Attitude: shows pitch and bank">
+            <div class="att-clip">
+              <div id="att-horizon" class="att-horizon">
+                <div class="att-sky"></div>
+                <div class="att-ground"></div>
+                <div class="att-lines"></div>
+              </div>
+            </div>
+            <svg class="att-face" viewBox="-50 -50 100 100" aria-hidden="true">
+              <line class="bank" x1="-32.9" y1="-19.0" x2="-38.1" y2="-22.0" />
+              <line class="bank" x1="-26.9" y1="-26.9" x2="-29.7" y2="-29.7" />
+              <line class="bank" x1="-19.0" y1="-32.9" x2="-22.0" y2="-38.1" />
+              <line class="bank" x1="-13.0" y1="-35.7" x2="-14.4" y2="-39.5" />
+              <line class="bank" x1="-6.6" y1="-37.4" x2="-7.3" y2="-41.4" />
+              <line class="bank" x1="0.0" y1="-38.0" x2="0.0" y2="-44.0" />
+              <line class="bank" x1="6.6" y1="-37.4" x2="7.3" y2="-41.4" />
+              <line class="bank" x1="13.0" y1="-35.7" x2="14.4" y2="-39.5" />
+              <line class="bank" x1="19.0" y1="-32.9" x2="22.0" y2="-38.1" />
+              <line class="bank" x1="26.9" y1="-26.9" x2="29.7" y2="-29.7" />
+              <line class="bank" x1="32.9" y1="-19.0" x2="38.1" y2="-22.0" />
+              <g id="att-pointer" class="needle-group"><path class="att-pointer" d="M0-37-3-31h6z" /></g>
+              <path class="att-plane" d="M-24 0h14l4 5 4-5 4 5 4-5h14" />
+              <circle class="att-dot" r="2" />
+            </svg>
+            <span class="gauge-label">Attitude</span>
+          </div>
+
+          <div id="instrument-strip" class="instrument-strip">
+            <div class="gauge">
+              <svg viewBox="-50 -50 100 100" aria-hidden="true">
+                <circle class="face" r="48" />
+                <path class="arc-green" d="M-36.4 -16.5 A40 40 0 0 1 33.3 -22.2" />
+                <path class="arc-yellow" d="M33.3 -22.2 A40 40 0 0 1 37.0 15.3" />
+                <line class="tick major" x1="-18.0" y1="31.2" x2="-21.5" y2="37.2" />
+                <line class="tick" x1="-27.1" y1="23.7" x2="-32.3" y2="28.4" />
+                <line class="tick major" x1="-33.3" y1="13.8" x2="-39.7" y2="16.5" />
+                <line class="tick" x1="-35.9" y1="2.4" x2="-42.9" y2="2.8" />
+                <line class="tick major" x1="-34.8" y1="-9.3" x2="-41.5" y2="-11.1" />
+                <line class="tick" x1="-29.9" y1="-20.0" x2="-35.8" y2="-23.9" />
+                <line class="tick major" x1="-21.9" y1="-28.6" x2="-26.2" y2="-34.1" />
+                <line class="tick" x1="-11.6" y1="-34.1" x2="-13.8" y2="-40.7" />
+                <line class="tick major" x1="0.0" y1="-36.0" x2="0.0" y2="-43.0" />
+                <line class="tick" x1="11.6" y1="-34.1" x2="13.8" y2="-40.7" />
+                <line class="tick major" x1="21.9" y1="-28.6" x2="26.2" y2="-34.1" />
+                <line class="tick" x1="29.9" y1="-20.0" x2="35.8" y2="-23.9" />
+                <line class="tick major" x1="34.8" y1="-9.3" x2="41.5" y2="-11.1" />
+                <line class="tick" x1="35.9" y1="2.4" x2="42.9" y2="2.8" />
+                <line class="tick major" x1="33.3" y1="13.8" x2="39.7" y2="16.5" />
+                <line class="tick" x1="27.1" y1="23.7" x2="32.3" y2="28.4" />
+                <line class="tick major" x1="18.0" y1="31.2" x2="21.5" y2="37.2" />
+                <line class="redline" x1="25.6" y1="22.4" x2="33.1" y2="29.0" />
+                <text class="num" x="-13.5" y="26.9">0</text>
+                <text class="num" x="-26.1" y="-3.5">40</text>
+                <text class="num" x="0.0" y="-23.5">80</text>
+                <text class="num" x="26.1" y="-3.5">120</text>
+                <text class="num" x="13.5" y="26.9">160</text>
+                <g id="asi-needle" class="needle-group"><path class="needle" d="M-1.6 6 0-40 1.6 6z" /></g>
+                <circle class="hub" r="3.5" />
+              </svg>
+              <div class="readout"><strong id="airspeed">0</strong><small>kt</small></div>
+              <span class="gauge-label">Airspeed</span>
+            </div>
+            <div class="gauge">
+              <svg viewBox="-50 -50 100 100" aria-hidden="true">
+                <circle class="face" r="48" />
+                <line class="tick major" x1="0.0" y1="-39.0" x2="0.0" y2="-43.0" />
+                <line class="tick" x1="4.9" y1="-38.7" x2="5.4" y2="-42.7" />
+                <line class="tick" x1="9.7" y1="-37.8" x2="10.7" y2="-41.6" />
+                <line class="tick" x1="14.4" y1="-36.3" x2="15.8" y2="-40.0" />
+                <line class="tick" x1="18.8" y1="-34.2" x2="20.7" y2="-37.7" />
+                <line class="tick major" x1="22.9" y1="-31.6" x2="25.3" y2="-34.8" />
+                <line class="tick" x1="26.7" y1="-28.4" x2="29.4" y2="-31.3" />
+                <line class="tick" x1="30.1" y1="-24.9" x2="33.1" y2="-27.4" />
+                <line class="tick" x1="32.9" y1="-20.9" x2="36.3" y2="-23.0" />
+                <line class="tick" x1="35.3" y1="-16.6" x2="38.9" y2="-18.3" />
+                <line class="tick major" x1="37.1" y1="-12.1" x2="40.9" y2="-13.3" />
+                <line class="tick" x1="38.3" y1="-7.3" x2="42.2" y2="-8.1" />
+                <line class="tick" x1="38.9" y1="-2.4" x2="42.9" y2="-2.7" />
+                <line class="tick" x1="38.9" y1="2.4" x2="42.9" y2="2.7" />
+                <line class="tick" x1="38.3" y1="7.3" x2="42.2" y2="8.1" />
+                <line class="tick major" x1="37.1" y1="12.1" x2="40.9" y2="13.3" />
+                <line class="tick" x1="35.3" y1="16.6" x2="38.9" y2="18.3" />
+                <line class="tick" x1="32.9" y1="20.9" x2="36.3" y2="23.0" />
+                <line class="tick" x1="30.1" y1="24.9" x2="33.1" y2="27.4" />
+                <line class="tick" x1="26.7" y1="28.4" x2="29.4" y2="31.3" />
+                <line class="tick major" x1="22.9" y1="31.6" x2="25.3" y2="34.8" />
+                <line class="tick" x1="18.8" y1="34.2" x2="20.7" y2="37.7" />
+                <line class="tick" x1="14.4" y1="36.3" x2="15.8" y2="40.0" />
+                <line class="tick" x1="9.7" y1="37.8" x2="10.7" y2="41.6" />
+                <line class="tick" x1="4.9" y1="38.7" x2="5.4" y2="42.7" />
+                <line class="tick major" x1="0.0" y1="39.0" x2="0.0" y2="43.0" />
+                <line class="tick" x1="-4.9" y1="38.7" x2="-5.4" y2="42.7" />
+                <line class="tick" x1="-9.7" y1="37.8" x2="-10.7" y2="41.6" />
+                <line class="tick" x1="-14.4" y1="36.3" x2="-15.8" y2="40.0" />
+                <line class="tick" x1="-18.8" y1="34.2" x2="-20.7" y2="37.7" />
+                <line class="tick major" x1="-22.9" y1="31.6" x2="-25.3" y2="34.8" />
+                <line class="tick" x1="-26.7" y1="28.4" x2="-29.4" y2="31.3" />
+                <line class="tick" x1="-30.1" y1="24.9" x2="-33.1" y2="27.4" />
+                <line class="tick" x1="-32.9" y1="20.9" x2="-36.3" y2="23.0" />
+                <line class="tick" x1="-35.3" y1="16.6" x2="-38.9" y2="18.3" />
+                <line class="tick major" x1="-37.1" y1="12.1" x2="-40.9" y2="13.3" />
+                <line class="tick" x1="-38.3" y1="7.3" x2="-42.2" y2="8.1" />
+                <line class="tick" x1="-38.9" y1="2.4" x2="-42.9" y2="2.7" />
+                <line class="tick" x1="-38.9" y1="-2.4" x2="-42.9" y2="-2.7" />
+                <line class="tick" x1="-38.3" y1="-7.3" x2="-42.2" y2="-8.1" />
+                <line class="tick major" x1="-37.1" y1="-12.1" x2="-40.9" y2="-13.3" />
+                <line class="tick" x1="-35.3" y1="-16.6" x2="-38.9" y2="-18.3" />
+                <line class="tick" x1="-32.9" y1="-20.9" x2="-36.3" y2="-23.0" />
+                <line class="tick" x1="-30.1" y1="-24.9" x2="-33.1" y2="-27.4" />
+                <line class="tick" x1="-26.7" y1="-28.4" x2="-29.4" y2="-31.3" />
+                <line class="tick major" x1="-22.9" y1="-31.6" x2="-25.3" y2="-34.8" />
+                <line class="tick" x1="-18.8" y1="-34.2" x2="-20.7" y2="-37.7" />
+                <line class="tick" x1="-14.4" y1="-36.3" x2="-15.8" y2="-40.0" />
+                <line class="tick" x1="-9.7" y1="-37.8" x2="-10.7" y2="-41.6" />
+                <line class="tick" x1="-4.9" y1="-38.7" x2="-5.4" y2="-42.7" />
+                <line class="tick major" x1="-0.0" y1="-39.0" x2="-0.0" y2="-43.0" />
+                <text class="num" x="0.0" y="-26.5">0</text>
+                <text class="num" x="17.6" y="-20.8">1</text>
+                <text class="num" x="28.5" y="-5.8">2</text>
+                <text class="num" x="28.5" y="12.8">3</text>
+                <text class="num" x="17.6" y="27.8">4</text>
+                <text class="num" x="0.0" y="33.5">5</text>
+                <text class="num" x="-17.6" y="27.8">6</text>
+                <text class="num" x="-28.5" y="12.8">7</text>
+                <text class="num" x="-28.5" y="-5.8">8</text>
+                <text class="num" x="-17.6" y="-20.8">9</text>
+                <g id="alt-needle" class="needle-group"><path class="needle" d="M-1.6 6 0-40 1.6 6z" /></g>
+                <circle class="hub" r="3.5" />
+              </svg>
+              <div class="readout"><strong id="altitude">0</strong><small>ft</small></div>
+              <span class="gauge-label">Altitude</span>
+            </div>
+            <div class="gauge">
+              <svg viewBox="-50 -50 100 100" aria-hidden="true">
+                <circle class="face" r="48" />
+                <g id="hdg-card" class="needle-group">
+                  <line class="tick major" x1="0.0" y1="-38.0" x2="0.0" y2="-43.0" />
+                  <line class="tick" x1="6.6" y1="-37.4" x2="7.5" y2="-42.3" />
+                  <line class="tick" x1="13.0" y1="-35.7" x2="14.7" y2="-40.4" />
+                  <line class="tick major" x1="19.0" y1="-32.9" x2="21.5" y2="-37.2" />
+                  <line class="tick" x1="24.4" y1="-29.1" x2="27.6" y2="-32.9" />
+                  <line class="tick" x1="29.1" y1="-24.4" x2="32.9" y2="-27.6" />
+                  <line class="tick major" x1="32.9" y1="-19.0" x2="37.2" y2="-21.5" />
+                  <line class="tick" x1="35.7" y1="-13.0" x2="40.4" y2="-14.7" />
+                  <line class="tick" x1="37.4" y1="-6.6" x2="42.3" y2="-7.5" />
+                  <line class="tick major" x1="38.0" y1="0.0" x2="43.0" y2="0.0" />
+                  <line class="tick" x1="37.4" y1="6.6" x2="42.3" y2="7.5" />
+                  <line class="tick" x1="35.7" y1="13.0" x2="40.4" y2="14.7" />
+                  <line class="tick major" x1="32.9" y1="19.0" x2="37.2" y2="21.5" />
+                  <line class="tick" x1="29.1" y1="24.4" x2="32.9" y2="27.6" />
+                  <line class="tick" x1="24.4" y1="29.1" x2="27.6" y2="32.9" />
+                  <line class="tick major" x1="19.0" y1="32.9" x2="21.5" y2="37.2" />
+                  <line class="tick" x1="13.0" y1="35.7" x2="14.7" y2="40.4" />
+                  <line class="tick" x1="6.6" y1="37.4" x2="7.5" y2="42.3" />
+                  <line class="tick major" x1="0.0" y1="38.0" x2="0.0" y2="43.0" />
+                  <line class="tick" x1="-6.6" y1="37.4" x2="-7.5" y2="42.3" />
+                  <line class="tick" x1="-13.0" y1="35.7" x2="-14.7" y2="40.4" />
+                  <line class="tick major" x1="-19.0" y1="32.9" x2="-21.5" y2="37.2" />
+                  <line class="tick" x1="-24.4" y1="29.1" x2="-27.6" y2="32.9" />
+                  <line class="tick" x1="-29.1" y1="24.4" x2="-32.9" y2="27.6" />
+                  <line class="tick major" x1="-32.9" y1="19.0" x2="-37.2" y2="21.5" />
+                  <line class="tick" x1="-35.7" y1="13.0" x2="-40.4" y2="14.7" />
+                  <line class="tick" x1="-37.4" y1="6.6" x2="-42.3" y2="7.5" />
+                  <line class="tick major" x1="-38.0" y1="0.0" x2="-43.0" y2="0.0" />
+                  <line class="tick" x1="-37.4" y1="-6.6" x2="-42.3" y2="-7.5" />
+                  <line class="tick" x1="-35.7" y1="-13.0" x2="-40.4" y2="-14.7" />
+                  <line class="tick major" x1="-32.9" y1="-19.0" x2="-37.2" y2="-21.5" />
+                  <line class="tick" x1="-29.1" y1="-24.4" x2="-32.9" y2="-27.6" />
+                  <line class="tick" x1="-24.4" y1="-29.1" x2="-27.6" y2="-32.9" />
+                  <line class="tick major" x1="-19.0" y1="-32.9" x2="-21.5" y2="-37.2" />
+                  <line class="tick" x1="-13.0" y1="-35.7" x2="-14.7" y2="-40.4" />
+                  <line class="tick" x1="-6.6" y1="-37.4" x2="-7.5" y2="-42.3" />
+                  <line class="tick major" x1="-0.0" y1="-38.0" x2="-0.0" y2="-43.0" />
+                  <text class="num cardinal" x="0.0" y="-25.5">N</text>
+                  <text class="num" x="14.5" y="-21.6">3</text>
+                  <text class="num" x="25.1" y="-11.0">6</text>
+                  <text class="num cardinal" x="29.0" y="3.5">E</text>
+                  <text class="num" x="25.1" y="18.0">12</text>
+                  <text class="num" x="14.5" y="28.6">15</text>
+                  <text class="num cardinal" x="0.0" y="32.5">S</text>
+                  <text class="num" x="-14.5" y="28.6">21</text>
+                  <text class="num" x="-25.1" y="18.0">24</text>
+                  <text class="num cardinal" x="-29.0" y="3.5">W</text>
+                  <text class="num" x="-25.1" y="-11.0">30</text>
+                  <text class="num" x="-14.5" y="-21.6">33</text>
+                </g>
+                <path class="lubber" d="M0-46-4-38h8z" />
+                <use href="#plane-top" x="-9" y="-9" width="18" height="18" class="hdg-plane" />
+              </svg>
+              <div class="readout"><strong id="heading">000</strong><small>°</small></div>
+              <span class="gauge-label">Heading</span>
+            </div>
+            <div class="gauge">
+              <svg viewBox="-50 -50 100 100" aria-hidden="true">
+                <circle class="face" r="48" />
+                <line class="tick major" x1="35.5" y1="6.3" x2="42.3" y2="7.5" />
+                <line class="tick" x1="21.9" y1="28.6" x2="26.2" y2="34.1" />
+                <line class="tick major" x1="-3.1" y1="35.9" x2="-3.7" y2="42.8" />
+                <line class="tick" x1="-26.5" y1="24.3" x2="-31.7" y2="29.1" />
+                <line class="tick major" x1="-36.0" y1="-0.0" x2="-43.0" y2="-0.0" />
+                <line class="tick" x1="-26.5" y1="-24.3" x2="-31.7" y2="-29.1" />
+                <line class="tick major" x1="-3.1" y1="-35.9" x2="-3.7" y2="-42.8" />
+                <line class="tick" x1="21.9" y1="-28.6" x2="26.2" y2="-34.1" />
+                <line class="tick major" x1="35.5" y1="-6.3" x2="42.3" y2="-7.5" />
+                <text class="num" x="-28.0" y="3.5">0</text>
+                <text class="num" x="-2.4" y="-24.4">1</text>
+                <text class="num" x="27.6" y="-1.4">2</text>
+                <text class="num" x="-2.4" y="31.4">1</text>
+                <text class="num" x="27.6" y="8.4">2</text>
+                <text class="tiny" x="-20" y="-14">UP</text>
+                <text class="tiny" x="-20" y="20">DN</text>
+                <g id="vsi-needle" class="needle-group"><path class="needle" d="M-1.6 6 0-40 1.6 6z" /></g>
+                <circle class="hub" r="3.5" />
+              </svg>
+              <div class="readout"><strong id="vertical-speed">0</strong><small>ft/min</small></div>
+              <span class="gauge-label">Climb rate</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="cam-mini" class="cam-mini hidden">
+          <canvas id="cam-mini-view" width="160" height="120" aria-hidden="true"></canvas>
+          <button id="cam-mini-btn" class="cam-mini-status" type="button">
+            <span id="cam-mini-status">Camera yoke on</span>
+          </button>
+        </div>
+        <div
+          id="power-lever"
+          class="power-lever"
+          role="slider"
+          aria-label="Power"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          <span>Power</span>
+          <div class="power-lever-track"><div id="power-lever-fill"></div></div>
+        </div>
+        <div id="ground-warning" class="ground-warning hidden">
+          <strong>Ground is close</strong>
+          <span id="ground-warning-text">Lift the nose a little.</span>
+        </div>
+      </section>
+
+      <!-- FIRST-PERSON COCKPIT FRAME -->
+      <div id="cockpit-overlay" class="cockpit-overlay hidden" aria-hidden="true">
+        <div class="windshield-post left"></div>
+        <div class="windshield-post right"></div>
+        <div class="cockpit-reticle">
+          <span class="reticle-wing left"></span><span class="reticle-dot"></span
+          ><span class="reticle-wing right"></span>
+        </div>
+        <div class="cockpit-dash">
+          <div><span>Speed (kt)</span><strong id="cockpit-speed">0</strong></div>
+          <div><span>Height (ft)</span><strong id="cockpit-alt">0</strong></div>
+          <div><span>Heading</span><strong id="cockpit-hdg">000</strong></div>
+          <div><span>Power</span><strong id="cockpit-power">0%</strong></div>
+        </div>
+      </div>
+
+      <!-- LESSON INTRO -->
+      <section id="lesson-intro" class="dialog-screen hidden">
+        <div class="light-dialog">
+          <button id="lesson-intro-home" class="back-link" type="button">Home</button>
+          <p class="kicker" id="intro-kicker">Lesson 1</p>
+          <h2 id="intro-title">Pitch moves the nose.</h2>
+          <p id="intro-copy">Make the nose go up and down, then keep the plane steady.</p>
+          <div id="intro-controls" class="control-reminder"></div>
+          <button id="intro-go-btn" class="big-button" type="button">Let’s fly</button>
+        </div>
+      </section>
+
+      <!-- CAMERA YOKE: any object becomes the yoke -->
+      <section id="camera-screen" class="dialog-screen hidden">
+        <div class="light-dialog camera-dialog">
+          <button id="cam-close" class="back-link" type="button">Back</button>
+          <h2 id="cam-title">Fly with any object</h2>
+          <p id="cam-step" class="cam-step"></p>
+          <div class="cam-stage">
+            <video id="cam-video" autoplay muted playsinline></video>
+            <canvas id="cam-overlay" width="160" height="120" aria-hidden="true"></canvas>
+            <div id="cam-countdown" class="cam-countdown hidden" aria-live="assertive">3</div>
+          </div>
+          <p id="cam-warning" class="cam-warning hidden" role="alert"></p>
+          <div id="cam-meters" class="cam-meters hidden">
+            <div>
+              <span>Roll</span>
+              <div class="cam-meter"><i id="cam-roll-fill"></i></div>
+              <strong id="cam-roll-word">Level</strong>
+            </div>
+            <div>
+              <span>Pitch</span>
+              <div class="cam-meter"><i id="cam-pitch-fill"></i></div>
+              <strong id="cam-pitch-word">Level</strong>
+            </div>
+          </div>
+          <button id="cam-action" class="big-button" type="button">Turn on camera</button>
+          <div class="cam-options">
+            <button id="cam-redo" class="secondary-button hidden" type="button">Set center again</button>
+            <button id="cam-flip" class="secondary-button hidden" type="button">Switch camera</button>
+            <button id="cam-off" class="secondary-button hidden" type="button">Turn off</button>
+          </div>
+          <p class="cam-privacy">The video stays on this device. Nothing is recorded or sent anywhere.</p>
+        </div>
+      </section>
+
+      <!-- PAUSE -->
+      <section id="pause-screen" class="dialog-screen hidden">
+        <div class="light-dialog">
+          <h2>Paused</h2>
+          <dl id="pilot-log" class="pilot-log"></dl>
+          <button id="resume-btn" class="big-button" type="button">Keep flying</button>
+          <div class="button-row pause-row">
+            <button id="pause-camera-btn" class="secondary-button" type="button">Camera yoke</button>
+            <button id="pause-sound-btn" class="secondary-button" type="button" aria-pressed="true">
+              Sound: on
+            </button>
+            <button id="restart-btn" class="secondary-button" type="button">Restart</button>
+            <button id="pause-home-btn" class="secondary-button" type="button">Home</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- EDUCATIONAL QUESTION -->
+      <section id="question-screen" class="dialog-screen hidden">
+        <div class="light-dialog question-dialog">
+          <p class="kicker" id="question-kicker">Flight check</p>
+          <h2 id="question-title">The plane is going down fast.</h2>
+          <p id="question-copy">What should you do?</p>
+          <div id="question-options" class="choice-list"></div>
+          <p id="question-result" class="answer-result"></p>
+          <p id="question-fix" class="control-reminder hidden"></p>
+          <button id="question-continue" class="big-button hidden" type="button">Keep flying</button>
+        </div>
+      </section>
+
+      <!-- END-OF-FLIGHT QUIZ -->
+      <section id="quiz-screen" class="dialog-screen hidden">
+        <div class="light-dialog quiz-dialog">
+          <p class="kicker" id="quiz-progress">Question 1 of 3</p>
+          <h2 id="quiz-title">What did pitch change?</h2>
+          <div id="quiz-options" class="choice-list"></div>
+          <p id="quiz-result" class="answer-result"></p>
+          <button id="quiz-next-btn" class="big-button hidden" type="button">Next</button>
+        </div>
+      </section>
+
+      <!-- CRASH -->
+      <section id="crash-screen" class="dialog-screen hidden">
+        <div class="light-dialog crash-dialog">
+          <p class="kicker danger">Flight over</p>
+          <h2 id="crash-title">The flight ended.</h2>
+          <p id="crash-copy">Try again with a smaller move.</p>
+          <div class="button-row">
+            <button id="crash-retry" class="big-button" type="button">Try again</button>
+            <button id="crash-home" class="secondary-button" type="button">Home</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- CAREERS: jobs in aviation and women who led the way -->
+      <section id="careers-screen" class="dialog-screen hidden">
+        <div class="light-dialog info-dialog">
+          <button id="careers-back" class="back-link" type="button">Home</button>
+          <h2>Careers in the sky</h2>
+          <p>
+            Lots of people make every flight happen. Here are a few of the jobs, and the school subjects that
+            help.
+          </p>
+          <div class="career-list">
+            <div class="career">
+              <h3>Pilot</h3>
+              <p>Flies airplanes for airlines, cargo companies, rescue teams or the military.</p>
+              <small>Helpful subjects: math, physics, geography</small>
+            </div>
+            <div class="career">
+              <h3>Air traffic controller</h3>
+              <p>
+                Talks to pilots by radio and keeps every plane safely spaced apart, in the air and on the
+                ground.
+              </p>
+              <small>Helpful subjects: math, speaking and listening, geography</small>
+            </div>
+            <div class="career">
+              <h3>Aircraft mechanic</h3>
+              <p>Inspects and fixes engines, wings and landing gear so every plane is safe to fly.</p>
+              <small>Helpful subjects: shop or tech classes, physics, math</small>
+            </div>
+            <div class="career">
+              <h3>Aerospace engineer</h3>
+              <p>Designs and tests airplanes, drones, rockets and satellites.</p>
+              <small>Helpful subjects: math, physics, computer science</small>
+            </div>
+            <div class="career">
+              <h3>Electrical engineer</h3>
+              <p>Builds the electronics inside planes: radios, screens, sensors and autopilots.</p>
+              <small>Helpful subjects: math, physics, robotics, coding</small>
+            </div>
+            <div class="career">
+              <h3>Astronaut</h3>
+              <p>Flies to space. Many astronauts started out as pilots, engineers or scientists.</p>
+              <small>Helpful subjects: math, science, staying fit</small>
+            </div>
+          </div>
+          <h3 class="info-head">Women who led the way</h3>
+          <ul class="leader-list">
+            <li>
+              <strong>Bessie Coleman</strong> was the first African American woman to earn a pilot's license,
+              in 1921. No school in the U.S. would teach her, so she learned to fly in France.
+            </li>
+            <li>
+              <strong>Amelia Earhart</strong> was the first woman to fly alone across the Atlantic Ocean, in
+              1932.
+            </li>
+            <li>
+              <strong>Katherine Johnson</strong> was a NASA mathematician whose math helped send astronauts
+              into orbit and to the Moon.
+            </li>
+            <li><strong>Sally Ride</strong> became the first American woman in space in 1983.</li>
+            <li><strong>Mae Jemison</strong> became the first African American woman in space in 1992.</li>
+          </ul>
+          <button id="careers-close" class="big-button" type="button">Back home</button>
+        </div>
+      </section>
+
+      <!-- FLY FOR REAL: links to programs that give young people a first flight.
+           The app never asks where you live; these sites have their own search. -->
+      <section id="discovery-screen" class="dialog-screen hidden">
+        <div class="light-dialog info-dialog">
+          <button id="discovery-back" class="back-link" type="button">Home</button>
+          <h2>Find a discovery flight near you</h2>
+          <p>
+            A discovery flight is a first ride in a small plane with a real pilot. Some programs are free for
+            kids and teens. Ask a parent or guardian to look with you.
+          </p>
+          <div class="career-list">
+            <a
+              class="career link-card"
+              href="https://www.eaa.org/eaa/youth/free-ye-flights"
+              target="_blank"
+              rel="noopener"
+            >
+              <h3>EAA Young Eagles</h3>
+              <p>Free first airplane rides for ages 8 to 17, given by volunteer pilots at local airports.</p>
+              <small>eaa.org</small>
+            </a>
+            <a class="career link-card" href="https://www.wai.org/giad" target="_blank" rel="noopener">
+              <h3>Girls in Aviation Day</h3>
+              <p>
+                A free yearly event by Women in Aviation International, with hands-on aviation fun at events
+                around the world.
+              </p>
+              <small>wai.org</small>
+            </a>
+            <a
+              class="career link-card"
+              href="https://www.gocivilairpatrol.com/programs/cadets"
+              target="_blank"
+              rel="noopener"
+            >
+              <h3>Civil Air Patrol cadets</h3>
+              <p>For ages 12 to 18: learn about aviation, leadership and science, with chances to fly.</p>
+              <small>gocivilairpatrol.com</small>
+            </a>
+            <a
+              class="career link-card"
+              href="https://www.aopa.org/training-and-safety/learn-to-fly/flight-schools"
+              target="_blank"
+              rel="noopener"
+            >
+              <h3>Flight school finder</h3>
+              <p>
+                Search for flight schools near you. Many offer a paid discovery flight with an instructor.
+              </p>
+              <small>aopa.org</small>
+            </a>
+          </div>
+          <button id="discovery-close" class="big-button" type="button">Back home</button>
+        </div>
+      </section>
+
+      <!-- COMPLETE -->
+      <section id="complete-screen" class="dialog-screen hidden">
+        <div class="light-dialog success-dialog">
+          <p class="kicker success">Lesson complete</p>
+          <h2 id="complete-title">Nice flight!</h2>
+          <p id="complete-copy">You finished the lesson.</p>
+          <div class="button-row">
+            <button id="next-btn" class="big-button" type="button">Next lesson</button>
+            <button id="complete-retry" class="secondary-button" type="button">Fly it again</button>
+            <button id="complete-home" class="secondary-button" type="button">Home</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Shown when a phone is held upright -->
+      <div id="rotate-screen" class="rotate-screen" role="alert">
+        <svg class="rotate-phone" viewBox="0 0 120 120" aria-hidden="true">
+          <rect class="phone" x="38" y="18" width="44" height="84" rx="8" />
+          <circle class="dot" cx="60" cy="92" r="3" />
+          <path class="turn" d="M24 64a36 36 0 0 1 22-38M41 20l6 6-8 3" />
+        </svg>
+        <h2>Turn your phone sideways</h2>
+        <p>AeroKids flies best with the screen wide, like a real windshield.</p>
+      </div>
+
+      <div id="load-error" class="load-error hidden">
+        The simulator could not load. Open the whole folder through a web server.
+      </div>
+    </main>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

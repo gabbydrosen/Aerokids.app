@@ -1,0 +1,10 @@
+{
+  "name": "AeroKids Flight Simulator",
+  "short_name": "AeroKids",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#cfe5f5",
+  "theme_color": "#13293d",
+  "icons": [{ "src": "./images/icon-512.png", "sizes": "512x512", "type": "image/png" }]
+}
