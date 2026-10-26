@@ -73,4 +73,4 @@ Three.js 0.180.0 - MIT License.
 
 MediaPipe Tasks Vision 0.10.21 and Hand Landmarker - Google, Apache 2.0.
 
-Full license information is included in the licenses folder. Some textures and sounds were resized or converted for use in the simulator. Other parts of the environment, including the farm, roads, balloon, wind turbine, water tower, hangar, tower, and lesson diagrams, are generated directly in the code.
+Full license information is included in the licenses folder. Some textures and sounds were resized or converted for use in the simulator. Other parts of the environment, including the farm, roads, balloon, wind turbine, water tower, hangar, tower, and lesson diagrams, are directly in the code.
