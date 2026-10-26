@@ -24,28 +24,36 @@ Run python3 start_server.py and open http://127.0.0.1:8000, or use the Live Serv
 
 The camera controls require HTTPS or localhost.
 
-Additional documentation is available in PHONE-SETUP.md and HOW-IT-WORKS.md.
-
 # Controls
 
-W / S - Pitch up / down
-A / D - Roll left / right
-Q / E - Rudder
-Up / Down arrows - Increase / decrease throttle
-C - Change camera view
-M - Toggle sound
+On a phone (turn it sideways):
+
+- Hold an object with both hands like a steering wheel so the front camera can see it
+- Tilt it left / right - Roll left / right
+- Pull it toward you - Nose up
+- Push it away - Nose down
+- Power lever on the screen - Drag up for more throttle
+
+On a computer:
+
+- W / S - Pitch up / down
+- A / D - Roll left / right
+- Q / E - Rudder
+- Up / Down arrows - Increase / decrease throttle
+- C - Change camera view
+- M - Toggle sound
 
 # Files
 
-index.html - Main interface
-style.css - Styling
-js/main.js - Menus, lessons, free flight, and flight interface
-js/content.js - Lesson content, questions, and facts
-js/sim.js - Flight physics and 3D simulation
-js/world.js - Environment
-js/handyoke.js - Camera controls
-js/input.js - Keyboard and throttle controls
-js/drawings.js, js/sound.js, js/textures.js - Graphics, audio, and textures
+- index.html - Main interface
+- style.css - Styling
+- js/main.js - Menus, lessons, free flight, and flight interface
+- js/content.js - Lesson content, questions, and facts
+- js/sim.js - Flight physics and 3D simulation
+- js/world.js - Environment
+- js/handyoke.js - Camera controls
+- js/input.js - Keyboard and throttle controls
+- js/drawings.js, js/sound.js, js/textures.js - Graphics, audio, and textures
 
 The lessons are based on concepts from the FAA's Airplane Flying Handbook and Pilot's Handbook of Aeronautical Knowledge. The physics is simplified for educational purposes and is not intended for actual flight training.
 

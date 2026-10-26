@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-// textures drawn with canvas at startup (returns null in node tests)
+// textures drawn with canvas at startup
 
 const hasCanvas = () => typeof document !== "undefined" && typeof document.createElement === "function";
 

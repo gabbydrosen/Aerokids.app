@@ -33,7 +33,7 @@ export function lessonCorridor(x, z, pad = 0) {
   return x > -760 - pad && x < 1200 + pad && z > -4400 - pad && z < 1300 + pad;
 }
 
-// Field colors: a patchwork that reads clearly from the air.
+// field colors
 const GRASS = [0x8cc063, 0x7db556, 0x9fcf6e, 0x74ad50, 0x95c76a];
 const CROPS = [0xe7c55c, 0xf0d84a, 0xb6d66a, 0xb98a5a, 0xa98bd0, 0xd9b45a];
 const VEHICLES = [
