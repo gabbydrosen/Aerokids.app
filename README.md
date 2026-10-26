@@ -1,10 +1,10 @@
-##AeroKids
+## AeroKids
 
 AeroKids is a flight simulator designed to teach kids about aviation and how airplanes fly. The goal is to make aerospace education more accessible through an interactive learning experience.
 
 The simulator can be controlled using a keyboard, on-screen controls, or a phone camera. The camera option lets users hold an object like a book or plate in front of their phone and use it as a steering wheel.
 
-#Features
+# Features
 
 Flight School - Four lessons covering pitch, rolling and turning, straight and level flight, and takeoff and landing. Each lesson includes picture cards, flying challenges, and a short quiz.
 
@@ -16,7 +16,7 @@ Careers - Information about different aviation careers and women who made import
 
 Flight Opportunities - Information about programs that offer kids the chance to experience flying in real life.
 
-#Running the Simulator
+# Running the Simulator
 
 The simulator needs a local web server to load the 3D models.
 
@@ -26,7 +26,7 @@ The camera controls require HTTPS or localhost.
 
 Additional documentation is available in PHONE-SETUP.md and HOW-IT-WORKS.md.
 
-#Controls
+# Controls
 
 W / S - Pitch up / down
 A / D - Roll left / right
@@ -35,7 +35,7 @@ Up / Down arrows - Increase / decrease throttle
 C - Change camera view
 M - Toggle sound
 
-#Files
+# Files
 
 index.html - Main interface
 style.css - Styling
@@ -49,7 +49,7 @@ js/drawings.js, js/sound.js, js/textures.js - Graphics, audio, and textures
 
 The lessons are based on concepts from the FAA's Airplane Flying Handbook and Pilot's Handbook of Aeronautical Knowledge. The physics is simplified for educational purposes and is not intended for actual flight training.
 
-#Credits
+# Credits
 
 Airplane - "Plane" by osmosikum on Sketchfab, CC BY 4.0. Textures resized to 512 px.
 https://sketchfab.com/3d-models/plane-cedc8a07370747f7b0d14400cdf2faf9
