@@ -1,6 +1,6 @@
 ## AeroKids
 
-AeroKids is a flight simulator designed to teach kids about aviation and how airplanes fly. The goal is to make aerospace education more accessible through an interactive learning experience.
+AeroKids is a flight simulator designed to teach kids about aviation and how airplanes fly. The goal is to make aerospace education more accessible and make learning interactive for kids. Enjoy!
 
 The simulator can be controlled using a keyboard, on-screen controls, or a phone camera. The camera option lets users hold an object like a book or plate in front of their phone and use it as a steering wheel.
 
