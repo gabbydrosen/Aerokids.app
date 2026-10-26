@@ -16,14 +16,6 @@ Careers - Information about different aviation careers and women who made import
 
 Flight Opportunities - Information about programs that offer kids the chance to experience flying in real life.
 
-# Running the Simulator
-
-The simulator needs a local web server to load the 3D models.
-
-Run python3 start_server.py and open http://127.0.0.1:8000, or use the Live Server extension in VS Code.
-
-The camera controls require HTTPS or localhost.
-
 # Controls
 
 On a phone (turn it sideways):
