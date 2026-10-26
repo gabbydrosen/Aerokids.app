@@ -149,7 +149,6 @@ p {
 }
 
 /* buttons */
-/* Main buttons are solid with a darker bottom edge, like a real push button. */
 .big-button,
 .go-button {
   display: inline-flex;
@@ -308,8 +307,8 @@ p {
 }
 
 /* home */
-/* One paper sheet docked on the left; the plane circles on the runway to its right.
-   The sheet shows either the home choices or the Flight school list (data-view). */
+/* menu on the left, parked plane on the right.
+   data-view switches between the home menu and the Flight school list */
 .home-screen {
   position: absolute;
   top: 0;
@@ -377,7 +376,7 @@ p {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-/* Camera setup is a quieter third choice: a text button, not a third box. */
+/* camera setup button (just text) */
 .home-cam {
   display: inline-flex;
   align-items: center;
@@ -405,7 +404,7 @@ body.camera-yoke .home-cam {
   stroke-linejoin: round;
 }
 
-/* Free flight, Careers and Fly for real: white rows with an icon, a name and one line. */
+/* Free flight, Careers and Fly for real buttons */
 .home-row {
   justify-content: flex-start;
   gap: 12px;
@@ -1009,7 +1008,7 @@ body.camera-yoke #camera-btn {
 .skill-toast.education-toast {
   color: #b9f5c9;
 }
-/* Free flight: the landmark fact, on the green "learning" color. */
+/* landmark fact in free flight */
 .fact-card {
   position: absolute;
   left: 50%;
@@ -1218,7 +1217,7 @@ body.camera-yoke #camera-btn {
   stroke-linejoin: round;
 }
 
-/* Power lever: tick marks every 25%, a sun-yellow fill and a white handle on top of it. */
+/* power lever (throttle) */
 .power-lever {
   position: absolute;
   left: calc(10px + var(--sl));
